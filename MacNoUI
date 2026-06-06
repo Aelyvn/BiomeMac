@@ -1,5 +1,5 @@
 -- ==========================================
--- SOL'S RNG TRACKER V7.5 (ALL BIOMES INCLUDED) - OPTIMIZED
+-- SOL'S RNG TRACKER V7.6 (DIRECT PATH OPTIMIZED)
 -- ==========================================
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -20,9 +20,6 @@ local MERCHANT_NAMES = {"Mari", "Rin", "Jester"}
 local function sendDiscordEmbed(eventType, name, isEnd)
     local webhookUrl = getgenv().Webhook
     if not webhookUrl or webhookUrl == "" then return false end
-    
-    -- ĐÃ FIX: Không cần dùng webhook.lewisakura.moe nếu xài executor request. 
-    -- Việc này giúp gửi webhook mượt hơn và không lo proxy bị sập.
 
     local playerName = player.Name
     local jobId = game.JobId ~= "" and game.JobId or "Private/Studio"
@@ -94,7 +91,7 @@ local function sendDiscordEmbed(eventType, name, isEnd)
 end
 
 -- ==========================================
--- HÀM QUÉT DỮ LIỆU TỐI ƯU HÓA
+-- HÀM QUÉT DỮ LIỆU CHÍNH XÁC
 -- ==========================================
 local function getCurrentBiome()
     local workspaceBiome = Workspace:FindFirstChild("Biome")
@@ -105,20 +102,20 @@ local function getCurrentBiome()
         end
     end
 
-    -- Tối ưu: Thay vì quét toàn bộ GUI, chỉ tìm ở các lớp ngoài để tránh lag
     if player and player:FindFirstChild("PlayerGui") then
-        for _, gui in ipairs(player.PlayerGui:GetChildren()) do
-            if gui:IsA("ScreenGui") then
-                for _, v in ipairs(gui:GetDescendants()) do
-                    if v:IsA("TextLabel") and v.Visible then
-                        local text = v.Text
-                        if text and #text < 25 then 
-                            local cleanText = string.upper(string.match(text, "^%s*(.-)%s*$") or "")
-                            for _, biome in ipairs(BIOME_KEYWORDS) do
-                                if cleanText == biome or cleanText == ("[" .. biome .. "]") or cleanText == ("BIOME: " .. biome) then
-                                    return biome
-                                end
-                            end
+        local mainInterface = player.PlayerGui:FindFirstChild("MainInterface")
+        if mainInterface then
+            local children = mainInterface:GetChildren()
+            local targetElement = children[9] -- Có thể đổi thành :FindFirstChild("Tên_Thật") nếu muốn ổn định lâu dài
+            
+            if targetElement and targetElement:FindFirstChild("TextLabel") then
+                local textLabel = targetElement.TextLabel
+                local text = textLabel.Text
+                if text and text ~= "" then
+                    local cleanText = string.upper(string.match(text, "^%s*(.-)%s*$") or "")
+                    for _, biome in ipairs(BIOME_KEYWORDS) do
+                        if string.find(cleanText, biome) then 
+                            return biome 
                         end
                     end
                 end
@@ -130,18 +127,11 @@ end
 
 local function scanForMerchants()
     local found = {}
-    -- Tối ưu: Thường merchant trong Sol's RNG xuất hiện dưới dạng Model trực tiếp ở Workspace hoặc trong mục NPCs. 
-    -- Giới hạn quét các Model thay vì toàn bộ Part/Mesh/Texture để giữ FPS cao nhất.
     for _, v in ipairs(Workspace:GetDescendants()) do
         if v:IsA("Model") then
-            -- Check tên Model trước
             for _, name in ipairs(MERCHANT_NAMES) do
-                if string.find(v.Name, name) then
-                    found[name] = true
-                end
+                if string.find(v.Name, name) then found[name] = true end
             end
-            
-            -- Nếu có ProximityPrompt bên trong Model đó
             local prompt = v:FindFirstChildWhichIsA("ProximityPrompt", true)
             if prompt then
                 local textToCheck = (prompt.ObjectText or "") .. " " .. (prompt.ActionText or "")
@@ -160,7 +150,7 @@ end
 local currentBiome = "" 
 local activeMerchants = {}
 
-print("[Sol's Tracker] Đang khởi động hệ thống V7.5 (Bao gồm Normal Biome)...")
+print("[Sol's Tracker] Đang khởi động hệ thống V7.6 (Tối ưu hóa đường dẫn UI)...")
 
 getgenv().SolsTrackerLoop = task.spawn(function()
     while true do
@@ -191,7 +181,6 @@ getgenv().SolsTrackerLoop = task.spawn(function()
             end
         end
 
-        -- Tăng thời gian delay một chút để an toàn cho hiệu năng
         task.wait(3)
     end
 end)
