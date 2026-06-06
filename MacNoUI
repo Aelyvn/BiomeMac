@@ -10,7 +10,7 @@ if getgenv().BiomeConnections then
 end
 getgenv().BiomeConnections = {}
 
-local BIOME_KEYWORDS = {"NORMAL", "WINDY", "RAINY", "SNOWY", "SANDSTORM", "HELL", "STARFALL", "CORRUPTION", "DREAMSPACE", "CYBERSPACE", "SINGULARITY"}
+local BIOME_KEYWORDS = {"NORMAL", "WINDY", "RAINY", "SNOWY", "SANDSTORM", "HELL", "STARFALL", "CORRUPTION", "DREAMSPACE", "CYBERSPACE", "SINGULARITY", "HEAVENLY"}
 local MERCHANT_NAMES = {"Mari", "Rin", "Jester"}
 
 local currentBiome = "" 
@@ -18,17 +18,18 @@ local activeMerchants = {}
 
 local BIOME_VISUALS = {
     ["NORMAL"] = {Color = 0xA8D3A3, Image = ""},
-    ["WINDY"] = {Color = 0x2ECC71, Image = ""},
-    ["RAINY"] = {Color = 0x3498DB, Image = ""},
-    ["SNOWY"] = {Color = 0xFFFFFF, Image = ""},
-    ["SANDSTORM"] = {Color = 0xF1C40F, Image = ""},
-    ["HELL"] = {Color = 0xE74C3C, Image = ""},
-    ["STARFALL"] = {Color = 0x1A5276, Image = ""},
-    ["CORRUPTION"] = {Color = 0x8E44AD, Image = ""},
-    ["DREAMSPACE"] = {Color = 0xFF69B4, Image = ""},
-    ["CYBERSPACE"] = {Color = 0x00FFCC, Image = ""},
-    ["SINGULARITY"] = {Color = 0x17202A, Image = ""},
-    ["GLITCHED"] = {Color = 0x000000, Image = ""}
+    ["WINDY"] = {Color = 0x2ECC71, Image = "https://images-ext-1.discordapp.net/external/WEAlyXm_APt92sRubdYHMmTP52jAOla-kPWmkwEpH10/https/i.postimg.cc/6qPH4wy6/image.png?format=webp&quality=lossless"},
+    ["RAINY"] = {Color = 0x3498DB, Image = "https://images-ext-1.discordapp.net/external/X9QljSlTuTTLr2_lEpOTFQsoIfmGZA115RvliUbHmn0/https/static.wikia.nocookie.net/sol-rng/images/e/ec/Rainy.png?format=webp&quality=lossless"},
+    ["SNOWY"] = {Color = 0xFFFFFF, Image = "https://images-ext-1.discordapp.net/external/-o6c9pxCh-K5SeEK9uD8gn23NCNWiM3vNNsbgn6R7xk/https/static.wikia.nocookie.net/sol-rng/images/d/d7/Snowy_img.png?format=webp&quality=lossless"},
+    ["SANDSTORM"] = {Color = 0xF1C40F, Image = "https://images-ext-1.discordapp.net/external/YTaZjJxr0EBmyOrrUBS5wzVmM6QTvqKbe840RZbwDM4/https/i.postimg.cc/3JyL25Kz/image.png?format=webp&quality=lossless"},
+    ["HELL"] = {Color = 0xE74C3C, Image = "https://images-ext-1.discordapp.net/external/qKU_vjWUkYcSeetnZOS309VpG1QtQkrtdYNdZYnIVYw/https/i.postimg.cc/hGC5xNyY/image.png?format=webp&quality=lossless"},
+    ["STARFALL"] = {Color = 0x1A5276, Image = "https://images-ext-1.discordapp.net/external/O8bkaQy5NX1zWplzfk6ws-hRtBR7pOcOgxxlqKmmUkA/https/i.postimg.cc/1t0dY4J8/image.png?format=webp&quality=lossless"},
+    ["CORRUPTION"] = {Color = 0x8E44AD, Image = "https://images-ext-1.discordapp.net/external/mJ_Zmf9mcBfvIdtdEjxkcDrGtYNECZ5hreL2GODQAJc/https/i.postimg.cc/ncZQ84Dh/image.png?format=webp&quality=lossless"},
+    ["DREAMSPACE"] = {Color = 0xFF69B4, Image = "https://images-ext-1.discordapp.net/external/KNr7Wgy0JCoNKi6Qsb0c6846rztwwhZCi7wmrCb9SoE/https/i.postimg.cc/rFjCcW3w/image.png?format=webp&quality=lossless"},
+    ["CYBERSPACE"] = {Color = 0x00FFCC, Image = "https://images-ext-1.discordapp.net/external/RuhdClHLMhSgZUXhR6ib3FmwIwXQ8RR2ClscG061wZU/https/at-cdn-s01.audiotool.com/2013/06/13/documents/zW2OHriFzthb06Ty5h9tUxEGgEw/0/cover256x256-f161eb9cd16c4786bbb3c78292e7131f.jpg?format=webp"},
+    ["SINGULARITY"] = {Color = 0x17202A, Image = "https://images-ext-1.discordapp.net/external/xJYbC3JAqtET_zeAqF8FFdRnSEAHerGlV2XflFT2W8s/https/images.stockcake.com/public/1/5/a/15a57388-244b-4e36-ade9-871b031bb041_medium/cosmic-anime-vortex-stockcake.jpg?format=webp"},
+    ["HEAVENLY"] = {Color = 0xFFD700, Image = "https://images-ext-1.discordapp.net/external/iuq2Tu5Gfm70tPYAT9FMOqkHeM1bvMMUJW2L0IG9OaQ/%3Fsize%3D240%26quality%3Dlossless/https/media.discordapp.net/stickers/1447481739240018010.webp?format=webp"},
+    ["GLITCHED"] = {Color = 0x000000, Image = "https://images-ext-1.discordapp.net/external/y4yKovwiS0dYo0PYSCREZVNUr6uKJbQUEeTmKhPv8Hc/https/i.postimg.cc/W3Lhtn5g/image.png?format=webp&quality=lossless"}
 }
 
 local function sendDiscordEmbed(eventType, name, isEnd)
@@ -189,27 +190,4 @@ getgenv().SolsTrackerLoop = task.spawn(function()
                 end
                 local prompt = v:FindFirstChildWhichIsA("ProximityPrompt", true)
                 if prompt then
-                    local textToCheck = (prompt.ObjectText or "") .. " " .. (prompt.ActionText or "")
-                    for _, name in ipairs(MERCHANT_NAMES) do
-                        if string.find(textToCheck, name) then foundMerchants[name] = true end
-                    end
-                end
-            end
-        end
-        
-        for merchantName, _ in pairs(foundMerchants) do
-            if not activeMerchants[merchantName] then
-                activeMerchants[merchantName] = true
-                sendDiscordEmbed("Merchant", merchantName, false)
-            end
-        end
-        
-        for merchantName, _ in pairs(activeMerchants) do
-            if not foundMerchants[merchantName] then
-                activeMerchants[merchantName] = nil
-            end
-        end
-
-        task.wait(5)
-    end
-end)
+                    local textToCheck = (prompt.ObjectText or "") .. " " ..
